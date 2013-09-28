@@ -5,7 +5,7 @@ PongNM stands for Pong Not iMproved
 
 
 Open index.html to any modern browser, set your preferences and just play.
-YOu can play human-vs-human, human-vs-pc and pc-vs-pc. On human-vs-pc, 
+You can play human-vs-human, human-vs-pc and pc-vs-pc. On human-vs-pc, 
 regardless of which side you choose for yourself, the opponent is going
 to use the AI level indicated by the "First AI Level" selection.
 
