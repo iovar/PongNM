@@ -138,12 +138,9 @@ Scene.prototype.__videoInit__ = function(){
 
 
 /*
- *  Initialize scene. This function exists since init(), will be overriden 
- *  by child methods, but the parent method has to be callable, to avoid
- *  code duplication. Not perfect really. A better and more generic way is
- *  needed to call overriden parent methods.
+ *  Initialize scene. 
  */
-Scene.prototype.__init__ = function(){
+Scene.prototype.init = function(){
     this.__videoInit__();
     if(this.valid){
         this.width = this.__drawing__.width;
@@ -154,13 +151,6 @@ Scene.prototype.__init__ = function(){
         this.redraw();
 
     }
-};
-
-/*
- *  Intialize the scene
- */
-Scene.prototype.init = function(){
-    this.__init__();
 };
 
 /*
@@ -231,7 +221,7 @@ PongNMScene.prototype=new Scene();
  */
 PongNMScene.prototype.init = function (){
 
-    this.__init__();
+    Scene.prototype.init.call(this,"init");
     this.context.font = "bold "+this.fontSize+
             "px 'Share Tech Mono','monospace'";
     
