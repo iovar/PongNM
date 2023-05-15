@@ -1,70 +1,51 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <title>PongNM!!!</title>
-        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <link rel="stylesheet" href="css/main.css">
-        <link href='http://fonts.googleapis.com/css?family=Share+Tech+Mono' rel='stylesheet' type='text/css'>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover, user-scalable=no, shrink-to-fit=no" />
+    <meta name="HandheldFriendly" content="true">
 
+    <title>PongNM</title>
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" sizes="144x144" href="icon.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+</head>
+<body>
+    <div class="root">
+        <canvas id="mainCanvas" width="400" height="300"></canvas>
+        <div class="controls">
+            <button type="button" id="start_game_button">Start game</button>
 
-        
-    </head>
-    <body>
-        <div id="center-element">
-            <div>
-                <div>
-                    <h1>Canvas!</h1>
-                    <div id="canvas-container">
-                        <canvas id="drawing" width="400" height="300">
-                        </canvas>
-                        
-                        <div> 
-                            <button type="button" id="start_game_button">Start game</button>
-                        
-                            <label for="player1">
-                                Player 1
-                                <input type="checkbox" id="player1_checkbox" checked>
-                            </label>
-                            <label for="player2">
-                                Player 2
-                                <input type="checkbox" id="player2_checkbox" >
-                            </label>
-                            <label for="max_score">Max Score:</label>
-                            <select id="max_score">
-                                <option>1</option>
-                                <option>3</option>
-                                <option>5</option>
-                                <option>7</option>
-                                <option>9</option>
-                                <option>11</option>
-                                <option>15</option>
-                                <option>21</option>
-                                <option>31</option>
-                                <option>50</option>
-                                <option>100</option>
-                                <option>1000</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label for="pc_level1">First AI Level:</label>
-                            <select id="pc_level1">
-                                <option>1</option>
-                                <option>2</option>
-                                <option>3</option>
-                            </select>
-                            <label for="pc_level2">Second AI Level:</label>
-                            <select id="pc_level2">
-                                <option>1</option>
-                                <option>2</option>
-                                <option>3</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <label for="player1">
+                Player 1
+                <input type="checkbox" id="player1" checked>
+            </label>
+            <label for="player2">
+                Player 2
+                <input type="checkbox" id="player2" >
+            </label>
+            <label for="max_score">Max Score:</label>
+            <select id="max_score">
+                <option>3</option>
+                <option>7</option>
+                <option>11</option>
+                <option>21</option>
+            </select>
+            <label for="pc_level1">First AI Level:</label>
+            <select id="pc_level1">
+                <option>1</option>
+                <option>2</option>
+                <option>3</option>
+            </select>
+            <label for="pc_level2">Second AI Level:</label>
+            <select id="pc_level2">
+                <option>1</option>
+                <option>2</option>
+                <option>3</option>
+            </select>
         </div>
-        <script src="js/pongnm.js"></script>
-        <script src="js/main.js"></script>
-
-    </body>
+    </div>
+    <script type="module" src="js/main.js"></script>
+</body>
 </html>
