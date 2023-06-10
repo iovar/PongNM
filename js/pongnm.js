@@ -1,316 +1,8 @@
-/*
- *  Currently used global variables:
- *
- *
- *  paddleStep: how much the paddle(or any box minus the Ball) goes up and down
- *  also used for the size of the paddle and the precision of the movement  of
- *  the AI players paddle.
- *  paddleOffset: minimum distance of a paddle from the scene edges, also used
- *  for the rendering of the middle line and the text, in PongNMScene
- *  paddleSpeed: adds motion towards a direction to the Box. This motion is
- *  applied gradually, by adding paddleStep to the location and removing that
- *  much from paddleSpeed, until it is zero.
- */
+import { getDynamicConfig } from './config.js';
+import { PongNMScene } from './scene.js';
 
+const { paddleStep, paddleOffset, paddleSpeed } = getDynamicConfig();
 
-var paddleStep=Math.floor(document.getElementById("mainCanvas").width/50);
-var paddleSpeed=2*paddleStep;
-var paddleOffset = paddleStep;
-
-/*****************************End Global Variables*****************************/
-
-/****************************Start Scene Class*********************************/
-/*
- *  Scene Class handles rendering, positioning and calling any specified
- *  functions that must run on every loop.
- *
- * @param {string} elemid , id of DOM element that is out canvas
- * @param {int} refresh, msecs between calls to redraw. 1000/refresh= framerate
- * @param {string} backgroundColor, optional, background color , default black
- * @param {string} foregroundColor, optional, foreground color , default white
- * @returns {Scene}
- */
-function Scene(elemid,refresh,  backgroundColor, foregroundColor) {
-
-    this.__elemid__=elemid;
-    this.valid=true;
-    this.backgroundColor=(backgroundColor)?backgroundColor:"#fff";
-    this.foregroundColor=(foregroundColor)?foregroundColor:"#000";
-    this.__refresh__=((refresh)?refresh:0);
-    this.redrawMutex=false;
-}
-
-/*
- * Start the rendering and processing loop of the scene
- *
- */
-Scene.prototype.start = function(){
-    if(this.__refresh__>0){
-        this.stop();
-        var self=this;
-        this.__timerid__=window.setInterval(
-            function(){
-                self["redraw"]();
-            },this.__refresh__);
-    }
-};
-
-/*
- *  Stop scene loop
- */
-Scene.prototype.stop = function(){
-    if(this.__timerid__)
-        window.clearInterval(this.__timerid__);
-};
-
-/*
- *  Basic loop of the Scene
- *  Paints objects on the scene and calls any functions on the
- *  callback functions queue. ALso calls the collideBoundaries fucntion
- *  for those objects that have it (object to containing box collision check).
- *
- *  The redrawMutex: when a game is finished, the function clear is called
- *  that empties the queue with the drawable items. It also stops the timer
- *  that calls redraw(this function). But, because the timer works
- *  asynchronously, the redraw() function may already be running when clear()
- *  is called, which causes Undefined references errors on accessing the queue.
- *  To prevent this we set a simple mutex (a flag really), that prevents clear()
- *  from running.
- *
- */
-Scene.prototype.redraw = function(){
-    this.redrawMutex=true;
-    var context=this.context;
-
-    context.fillStyle = this.backgroundColor;
-    context.strokeStyle = this.foregroundColor;
-
-    context.fillRect(0,0,this.width,this.height);
-
-
-    for(var i=0;i<this.callbacks.length;i++){
-        this.callbacks[i].self[this.callbacks[i].callback]();
-    }
-
-    for(var i=0;i<this.queue.length;i++){
-        if(this.queue[i]["collideBoundaries"])
-            this.queue[i]["collideBoundaries"](this.width,this.height);
-        this.queue[i]["draw"](context);
-    }
-    this.redrawMutex=false;
-
-};
-
-/* add functions that will be executed at every redraw loop, before the
- * rendering of the items on the scene. The functions are called array-style,
- * i.e. object_reference["method_name"]. This is the easiest way to call them
- * with the right context for 'this' , without passing it as a separate
- * argument in the function (which would mess up it's code)
- *
- * @param {Object} self, pointer to the object that will have its method called
- * @param {String} callback, name of the method
-  */
-Scene.prototype.addCallback = function(self,callback) {
-    this.callbacks.push({"self":self,"callback":callback});
-};
-
-/*
- *  Place all items on their resetting position, by calling their reset method
- */
-Scene.prototype.reset = function(){
-    for(var i=0;i<this.queue.length;i++){
-        this.queue[i]["reset"](this.width,this.height);
-    }
-};
-
-/*
- * get the drawing context from the Canvas
- */
-Scene.prototype.__videoInit__ = function(){
-
-    this.__drawing__=document.getElementById(this.__elemid__);
-    if(!this.__drawing__.getContext)
-        this.valid=false;
-    else
-        this.context=this.__drawing__.getContext("2d");
-
-};
-
-
-/*
- *  Initialize scene.
- */
-Scene.prototype.init = function(){
-    this.__videoInit__();
-    if(this.valid){
-        this.width = this.__drawing__.width;
-        this.height = this.__drawing__.height;
-
-        this.queue = new Array();
-        this.callbacks = new Array();
-        this.redraw();
-
-    }
-};
-
-/*
- * Add objects,(child classes of Primitive) in the scene.
- *
- * @param {Primitve} primitive that gets added for rendering
- */
-Scene.prototype.addPrimitive = function(primitive){
-    this.queue.push(primitive);
-
-    this.queue.sort(function(a,b) {
-        return ((a.z<=b.z)?-1:1);
-    });
-};
-
-/*
- *  Clear scene, if it isn't currently drawing, or reschedule for later if
- *  it is.
- *
- *  To really function as a mutex, redrawMutex should be locked by
- *  this function, preventing redraw() from working, while clear() works.
- *  It isn't needed here, because stop(), is always called before clear,
- *  so as soon as redraw exits, it doesn't happen again. In a more generic
- *  scenario, clear() will need to properly lock the Mutex, too, to prevent
- *  any race conditions.
- */
-Scene.prototype.clear = function(){
-    if(this.redrawMutex){
-        var self=this;
-        window.setTimeout(function(){
-            self["clear"];
-        }, this.__refresh__);
-    }
-    else{
-        this.queue.length=0;
-    }
-};
-/****************************End Scene Class***********************************/
-
-
-/****************************Start PongNMScene Class***************************/
-/*
- * Scene that is adjusted to this particular game. It paints scores and a line
- * in the middle. Also it calls the correct collision functions.
- *
- * See Scene documentation for more
- *
- *
- * @param {string} elemid
- * @param {inbt} refresh
- * @param {string} backgroundColor
- * @param {string} foregroundColor
- * @param {int} lineWidth
- * @returns {PongNMScene}
- */
-function PongNMScene(elemid,refresh,backgroundColor,foregroundColor,lineWidth){
-    Scene.call(this,elemid,refresh,backgroundColor,foregroundColor);
-
-    this.lineWidth=lineWidth;
-    this.score= new Array(0,0);
-    this.fontSize=5*paddleOffset;
-}
-
-PongNMScene.prototype=new Scene();
-
-/*
- *  Intialize the scene and the text that is used on it.
- */
-PongNMScene.prototype.init = function (){
-
-    Scene.prototype.init.call(this,"init");
-    this.context.font = "bold "+this.fontSize+
-            "px 'Share Tech Mono','monospace'";
-
-    this.redraw();
-
-};
-
-/*
- *  Basic loop of the PongNMScene. Does what Scene.redraw() does, plus paints
- *  middle line and score text. It also calls oject to object collision
- *  fucnctions.
- *
- *  See Scene documentation for more
- */
-PongNMScene.prototype.redraw = function(){
-    this.redrawMutex=true;
-    var context=this.context;
-
-    context.fillStyle = this.backgroundColor;
-    context.strokeStyle = this.foregroundColor;
-    context.lineWidth=this.lineWidth;
-
-    context.fillRect(0,0,this.width,this.height);
-
-
-    /* Text */
-    context.fillStyle = this.foregroundColor;
-    context.textBaseline = "top";
-
-
-    var offs_x=this.width/2;
-
-    context.textAlign = "right";
-    context.fillText(this.score[0], offs_x - 2*paddleOffset, 0);
-    context.textAlign = "left";
-    context.fillText(this.score[1], offs_x + 2*paddleOffset, 0);
-
-
-    context.fillStyle = this.backgroundColor;
-
-
-    var offs_y=0;
-
-    context.beginPath();
-    while(offs_y<this.height){
-        context.moveTo(offs_x,offs_y);
-        context.lineTo(offs_x,offs_y+paddleOffset);
-        offs_y+=2*paddleOffset;
-    }
-    context.stroke();
-
-    for(var i=0;i<this.callbacks.length;i++){
-        this.callbacks[i].self[this.callbacks[i].callback]();
-    }
-
-    for(var i=0;i<this.queue.length;i++){
-
-        this.queue[i]["slide"]();
-        if(this.queue[i]["collideBoundaries"])
-            this.queue[i]["collideBoundaries"](this.width,this.height);
-
-        this.queue[i]["draw"](context);
-        if(this.queue[i]["collidePrimitive"]){
-            for(var k=0;k<this.queue.length;k++){
-                if(!this.queue[k]["collidePrimitive"] || k>i){//only collide with remaining items
-                    this.queue[i]["collidePrimitive"](this.queue[k]);
-                }
-            }
-        }
-    }
-    this.redrawMutex=false;
-};
-/*
- *  Clear scene and the scores.
- *  See Scene.clear() for more
- */
-PongNMScene.prototype.clear = function(){
-    if(this.redrawMutex){
-        var self=this;
-        window.setTimeout(function(){
-            self["clear"];
-        }, this.__refresh__);
-    }
-    else{
-        this.queue.length=0;
-        this.score[0] = this.score[1] = 0;
-    }
-};
-/****************************End PongNMScene Class*****************************/
 
 
 /****************************Start Primitive Class*****************************/
@@ -365,7 +57,7 @@ Primitive.prototype.slide = function() {
  * Draw a primitve on the correct position. We move the scene, not the object,
  * so the context has to be saved and restored, or next objects will appear
  * in wrong positions. This function doesn't draw anything. It calls the
- * child functions __drawShape__ that will do the actual drawing
+ * child functions drawShape that will do the actual drawing
  *
  * @param {canvas 2d context} context, to draw in
  */
@@ -376,7 +68,7 @@ Primitive.prototype.draw = function(context) {
     context.translate(this.x,this.y);
     context.rotate(this.angle);
 
-    this.__drawShape__(context);
+    this.drawShape(context);
 
     context.restore();
 };
@@ -475,7 +167,7 @@ BoxPrimitive.prototype = new Primitive();
  * @param {type} context
  * @returns {undefined}
  */
-BoxPrimitive.prototype.__drawShape__ = function(context){
+BoxPrimitive.prototype.drawShape = function(context){
     context.fillRect(0,0,this.width,this.height);
 };
 
@@ -668,15 +360,15 @@ BoxBall.prototype.slide = function() {
 BoxBall.prototype.collideBoundaries = function(width,height){
 
     if(this.width+this.x >= width){
-        if(this.__goalCallback__){
-            this.__goalCallback__.self[this.__goalCallback__.callback](0);
+        if(this.goalCallback){
+            this.goalCallback.self[this.goalCallback.callback](0);
         }
 
         this.speedx=-Math.abs(this.speedx);
     }
     else if(this.x<=0){
-        if(this.__goalCallback__)
-            this.__goalCallback__.self[this.__goalCallback__.callback](1);
+        if(this.goalCallback)
+            this.goalCallback.self[this.goalCallback.callback](1);
         this.speedx=Math.abs(this.speedx);
     }
 
@@ -812,7 +504,7 @@ BoxBall.prototype.collidePrimitive = function (primitive){
  * @param {String} callback, name of callback function
   */
 BoxBall.prototype.goalCallback = function (self,callback){
-    this.__goalCallback__={"self":self,"callback":callback};
+    this.goalCallback={"self":self,"callback":callback};
 };
 /*************************End BoxBall Class************************************/
 

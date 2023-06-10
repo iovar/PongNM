@@ -1,53 +1,80 @@
 import { Game } from './pongnm.js';
 
-var game={};
+const START_BUTTON_ID = "start_game_button";
+const PLAYER1_ID = "player1";
+const PLAYER2_ID = "player2";
+const PC_LEVEL1_ID = "pc_level1";
+const PC_LEVEL2_ID = "pc_level2";
+const MAX_SCORE_ID = "max_score";
+const CONTROLS_ID = "controls";
 
-//in case it is there from a refresh or previous game that didn't end normally
-sessionStorage.removeItem("playingPongNM");
+function* settingsValues() {
+    const player1 = document.getElementById(PLAYER1_ID);
+    const player2 = document.getElementById(PLAYER2_ID);
+    const pcLevel1 = document.getElementById(PC_LEVEL1_ID);
+    const pcLevel2 = document.getElementById(PC_LEVEL2_ID);
+    const maxScore = document.getElementById(MAX_SCORE_ID);
 
-//called when the game starts
-function gameOver(){
-    document.getElementById("start_game_button").innerHTML="Start game";
-    game={};
-    sessionStorage.removeItem("playingPongNM");
+    let finished = false;
+    while(!finished) {
+        const finished = yield {
+            player1: player1.checked,
+            player2: player2.checked,
+            pcLevel1: pcLevel1.value,
+            pcLevel2: pcLevel2.value,
+            maxScore: maxScore.value,
+        };
+    }
+};
 
+function* settingsVisibility(show) {
     const controls = document.querySelector(".controls");
-    controls.style.display="block";
+    let visible = show;
+
+    while(true) {
+        if (visible) {
+            controls.classList.remove('hidden');
+        } else {
+            controls.classList.add('hidden');
+        }
+
+        visibl = yield;
+    }
 }
 
-// get values from html, launch game
 function startGame(){
-    var player1 = (document.getElementById("player1").checked);
-    var player2 = (document.getElementById("player2").checked);
-    var pcLevel1=parseInt(document.getElementById("pc_level1").value);
-    var pcLevel2=parseInt(document.getElementById("pc_level2").value);
-    var maxScore=parseInt(document.getElementById("max_score").value);
-    const controls = document.querySelector(".controls");
-    controls.style.display="none";
+    const values = settingsValues();
+    const visibility = settingsVisibility();
 
-    sessionStorage.setItem("playingPongNM",true);
-    document.getElementById("start_game_button").innerHTML="Stop game";
+    const {
+        player1,
+        player2,
+        pcLevel1,
+        pcLevel2,
+        maxScore,
+    } = values.next().value;
 
-    game = new Game(maxScore,gameOver);
-    game.newGame(player1,player2);
+    const game = new Game(
+        maxScore,
+        () => visibility.next(true)
+    );
 
-    if(!(player1 && player2))
-        game.AI[0].level=pcLevel1;
-    if(!(player1 || player2))
-        game.AI[1].level=pcLevel2;
+    visibility.next(false);
+    game.newGame(player1, player2);
+
+    if(!(player1 && player2)) {
+        game.AI[0].level = pcLevel1;
+    }
+    if(!(player1 || player2)) {
+        game.AI[1].level=  pcLevel2;
+    }
 
     setTimeout(() => game.ball.start(), 1000);
 }
 
-document.getElementById("start_game_button").addEventListener("click", function(event){
-    if(sessionStorage.getItem("playingPongNM")==="true"){
-        document.getElementById("start_game_button").innerHTML="Start game";
-        game.scene.stop();
-        game.scene.clear();
-        game={};
-        sessionStorage.removeItem("playingPongNM");
-    }
-    else {
-        startGame();
-    }
-});
+function main() {
+    const startButton = document.getElementById(START_BUTTON_ID);
+    startButton.addEventListener('click', () => startGame());
+}
+
+main();

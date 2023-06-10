@@ -17,6 +17,10 @@ html, body {
     color: #fff;
 }
 
+.hidden {
+    display: none !important;
+}
+
 canvas {
     border: 8px solid white;
     box-sizing: border-box;
