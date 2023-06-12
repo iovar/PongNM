@@ -7,7 +7,6 @@ class Scene {
         this.elemid = elemid;
         this.valid = true;
         this.refresh = refresh ? refresh : 0;
-        this.redrawMutex = false;
     }
 
     start() {
@@ -27,8 +26,7 @@ class Scene {
     }
 
     redraw() {
-        this.redrawMutex = true;
-        var context = this.context;
+        const context = this.context;
 
         context.fillStyle = config.background;
         context.strokeStyle = config.foreground;
@@ -36,15 +34,13 @@ class Scene {
         context.fillRect(0, 0, this.width, this.height);
 
 
-        for (var i = 0; i < this.callbacks.length; i++) {
+        for (let i = 0; i < this.callbacks.length; i++) {
             this.callbacks[i].self[this.callbacks[i].callback]();
         }
 
-        for (var i = 0; i < this.queue.length; i++) {
+        for (let i = 0; i < this.queue.length; i++) {
             this.queue[i].draw(context);
         }
-
-        this.redrawMutex = false;
     }
 
     add(callback) {
@@ -52,7 +48,7 @@ class Scene {
     }
 
     remove(callback) {
-        var index = this.queue.indexOf(callback);
+        const index = this.queue.indexOf(callback);
         if (index > -1) {
             this.queue.splice(index, 1);
         }
@@ -63,7 +59,7 @@ class Scene {
     }
 
     reset() {
-        for (var i = 0; i < this.queue.length; i++) {
+        for (let i = 0; i < this.queue.length; i++) {
             this.queue[i]["reset"](this.width, this.height);
         }
     }
@@ -98,15 +94,7 @@ class Scene {
     }
 
     clear() {
-        if (this.redrawMutex) {
-            var self = this;
-            window.setTimeout(function () {
-                self["clear"];
-            }, this.refresh);
-        }
-        else {
-            this.queue.length = 0;
-        }
+        this.queue.length = 0;
     }
 }
 
@@ -127,15 +115,15 @@ class Scene {
  * @returns {PongNMScene}
  */
 export class PongNMScene extends Scene {
-    constructor(elemid,refresh,backgroundColor,foregroundColor,lineWidth){
-        super(elemid,refresh,backgroundColor,foregroundColor);
+    constructor(elemid,refresh,lineWidth) {
+        super(elemid,refresh);
 
         this.lineWidth=lineWidth;
         this.score= new Array(0,0);
         this.fontSize=5*paddleOffset;
     }
 
-    init(){
+    init() {
         Scene.prototype.init.call(this,"init");
         this.context.font = "bold "+this.fontSize+
                 "px 'Share Tech Mono','monospace'";
@@ -143,9 +131,8 @@ export class PongNMScene extends Scene {
         this.redraw();
     }
 
-    redraw(){
-        this.redrawMutex=true;
-        var context=this.context;
+    redraw() {
+        const context=this.context;
 
         context.fillStyle = config.background;
         context.strokeStyle = config.foreground;
@@ -159,7 +146,7 @@ export class PongNMScene extends Scene {
         context.textBaseline = "top";
 
 
-        var offs_x=this.width/2;
+        let offs_x=this.width/2;
 
         context.textAlign = "right";
         context.fillText(this.score[0], offs_x - 2*paddleOffset, 0);
@@ -170,48 +157,39 @@ export class PongNMScene extends Scene {
         context.fillStyle = config.background;
 
 
-        var offs_y=0;
+        let offs_y=0;
 
         context.beginPath();
-        while(offs_y<this.height){
+        while(offs_y<this.height) {
             context.moveTo(offs_x,offs_y);
             context.lineTo(offs_x,offs_y+paddleOffset);
             offs_y+=2*paddleOffset;
         }
         context.stroke();
 
-        for(var i=0;i<this.callbacks.length;i++){
+        for (let i=0;i<this.callbacks.length;i++) {
             this.callbacks[i].self[this.callbacks[i].callback]();
         }
 
-        for(var i=0;i<this.queue.length;i++){
+        for (let i=0;i<this.queue.length;i++) {
 
             this.queue[i]["slide"]();
-            if(this.queue[i]["collideBoundaries"])
+            if (this.queue[i]["collideBoundaries"])
                 this.queue[i]["collideBoundaries"](this.width,this.height);
 
             this.queue[i]["draw"](context);
-            if(this.queue[i]["collidePrimitive"]){
-                for(var k=0;k<this.queue.length;k++){
-                    if(!this.queue[k]["collidePrimitive"] || k>i){//only collide with remaining items
+            if (this.queue[i]["collidePrimitive"]) {
+                for (let k=0;k<this.queue.length;k++) {
+                    if (!this.queue[k]["collidePrimitive"] || k>i) {//only collide with remaining items
                         this.queue[i]["collidePrimitive"](this.queue[k]);
                     }
                 }
             }
         }
-        this.redrawMutex=false;
     }
 
-    clear(){
-        if(this.redrawMutex){
-            var self=this;
-            window.setTimeout(function(){
-                self["clear"];
-            }, this.refresh);
-        }
-        else{
-            this.queue.length=0;
-            this.score[0] = this.score[1] = 0;
-        }
+    clear() {
+        this.queue.length=0;
+        this.score[0] = this.score[1] = 0;
     }
 }

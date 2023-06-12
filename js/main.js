@@ -1,23 +1,24 @@
+import { config } from './config.js';
 import { Game } from './pongnm.js';
 
-const START_BUTTON_ID = "start_game_button";
-const PLAYER1_ID = "player1";
-const PLAYER2_ID = "player2";
-const PC_LEVEL1_ID = "pc_level1";
-const PC_LEVEL2_ID = "pc_level2";
-const MAX_SCORE_ID = "max_score";
-const CONTROLS_ID = "controls";
+/*
+ * TODO
+ * move parts to separate files
+ * change to es6 code (that/this, var, classes, etc)
+ * try to fix styling with es6
+ * add touch functionality
+ */
 
 function* settingsValues() {
-    const player1 = document.getElementById(PLAYER1_ID);
-    const player2 = document.getElementById(PLAYER2_ID);
-    const pcLevel1 = document.getElementById(PC_LEVEL1_ID);
-    const pcLevel2 = document.getElementById(PC_LEVEL2_ID);
-    const maxScore = document.getElementById(MAX_SCORE_ID);
+    const player1 = document.getElementById(config.player1Id);
+    const player2 = document.getElementById(config.player2Id);
+    const pcLevel1 = document.getElementById(config.pcLevel1Id);
+    const pcLevel2 = document.getElementById(config.pcLevel2Id);
+    const maxScore = document.getElementById(config.maxScoreId);
 
     let finished = false;
     while(!finished) {
-        const finished = yield {
+        finished = yield {
             player1: player1.checked,
             player2: player2.checked,
             pcLevel1: pcLevel1.value,
@@ -25,7 +26,7 @@ function* settingsValues() {
             maxScore: maxScore.value,
         };
     }
-};
+}
 
 function* settingsVisibility(show) {
     const controls = document.querySelector(".controls");
@@ -38,7 +39,7 @@ function* settingsVisibility(show) {
             controls.classList.add('hidden');
         }
 
-        visibl = yield;
+        visible = yield;
     }
 }
 
@@ -66,14 +67,14 @@ function startGame(){
         game.AI[0].level = pcLevel1;
     }
     if(!(player1 || player2)) {
-        game.AI[1].level=  pcLevel2;
+        game.AI[1].level = pcLevel2;
     }
 
     setTimeout(() => game.ball.start(), 1000);
 }
 
 function main() {
-    const startButton = document.getElementById(START_BUTTON_ID);
+    const startButton = document.getElementById(config.startButtonId);
     startButton.addEventListener('click', () => startGame());
 }
 

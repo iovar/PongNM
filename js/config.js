@@ -15,4 +15,11 @@ export function getDynamicConfig() {
 export const config = {
     background: "#000000",
     foreground: "#FFFFFF",
+    startButtonId: "start_game_button",
+    player1Id: "player1",
+    player2Id: "player2",
+    pcLevel1Id: "pc_level1",
+    pcLevel2Id: "pc_level2",
+    maxScoreId: "max_score",
+    controlsId: "controls",
 };

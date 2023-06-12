@@ -15,7 +15,7 @@ const { paddleStep, paddleOffset, paddleSpeed } = getDynamicConfig();
  * @param {string} color. Color of the object, in html notation
  * @returns {Primitive}
  */
-function Primitive(shape,x,y,z,color){
+function Primitive(shape,x,y,z,color) {
 
     this.shape=shape;
     this.x=x;
@@ -35,19 +35,19 @@ function Primitive(shape,x,y,z,color){
  */
 Primitive.prototype.slide = function() {
 
-    if(this.speedx<0 ){
+    if (this.speedx<0 ) {
         this.x-=paddleStep;
         this.speedx+=paddleStep;
     }
-    else if(this.speedx>0){
+    else if (this.speedx>0) {
         this.x+=paddleStep;
         this.speedx-=paddleStep;
     }
-    if(this.speedy<0){
+    if (this.speedy<0) {
         this.y-=paddleStep;
         this.speedy+=paddleStep;
     }
-    else if(this.speedy>0){
+    else if (this.speedy>0) {
         this.y+=paddleStep;
         this.speedy-=paddleStep;
     }
@@ -79,7 +79,7 @@ Primitive.prototype.draw = function(context) {
  * @param {int} x
  * @param {int} y
  */
-Primitive.prototype.move = function(x,y){
+Primitive.prototype.move = function(x,y) {
     this.x=x;
     this.y=y;
 };
@@ -88,7 +88,7 @@ Primitive.prototype.move = function(x,y){
  *
  * @param {type} angle
   */
-Primitive.prototype.rotate = function(angle){
+Primitive.prototype.rotate = function(angle) {
     this.angle=angle;
 };
 
@@ -101,13 +101,13 @@ Primitive.prototype.rotate = function(angle){
  * @param {type} added, speed to add
  * @returns {Number}    new speed
  */
-Primitive.prototype.speedup = function(current,added){
-    if(current==0 || (current*added<0)){
+Primitive.prototype.speedup = function(current,added) {
+    if (current==0 || (current*added<0)) {
         return added;
     }
-    else if(Math.abs(current)<2*Math.abs(added))
+    else if (Math.abs(current)<2*Math.abs(added))
         return current+added;
-    else if(Math.abs(current)<4*Math.abs(added))
+    else if (Math.abs(current)<4*Math.abs(added))
         return current;
     else
         return 0;
@@ -119,9 +119,9 @@ Primitive.prototype.speedup = function(current,added){
  *
  * @param {object} spo, object with x and/or y properties, to apply to speedup
   */
-Primitive.prototype.speed = function(spo){
-    if(spo.x) this.speedx=this.speedup(this.speedx,spo.x);
-    if(spo.y) this.speedy=this.speedup(this.speedy,spo.y);
+Primitive.prototype.speed = function(spo) {
+    if (spo.x) this.speedx=this.speedup(this.speedx,spo.x);
+    if (spo.y) this.speedy=this.speedup(this.speedy,spo.y);
 };
 
 /*
@@ -130,7 +130,7 @@ Primitive.prototype.speed = function(spo){
  * @param {type} width
  * @param {type} height
  */
-Primitive.prototype.reset =function(width,height){
+Primitive.prototype.reset =function(width,height) {
     this.x=0;
     this.y=0;
 };
@@ -150,7 +150,7 @@ Primitive.prototype.reset =function(width,height){
  * @param {type} color
  * @returns {BoxPrimitive}
  */
-function BoxPrimitive(x,y,w,h,z,color){
+function BoxPrimitive(x,y,w,h,z,color) {
 
     Primitive.call(this,"box",x,y,z,color);
     this.width=w;
@@ -167,7 +167,7 @@ BoxPrimitive.prototype = new Primitive();
  * @param {type} context
  * @returns {undefined}
  */
-BoxPrimitive.prototype.drawShape = function(context){
+BoxPrimitive.prototype.drawShape = function(context) {
     context.fillRect(0,0,this.width,this.height);
 };
 
@@ -187,7 +187,7 @@ BoxPrimitive.prototype.drawShape = function(context){
  * @param {type} color
  * @returns {BoxColliding}
  */
-function BoxColliding(x,y,w,h,z,color){
+function BoxColliding(x,y,w,h,z,color) {
 
     BoxPrimitive.call(this,x,y,w,h,z,color);
 
@@ -203,22 +203,22 @@ BoxColliding.prototype = new BoxPrimitive();
  * @param {type} width
  * @param {type} height
  */
-BoxColliding.prototype.collideBoundaries = function(width,height){
+BoxColliding.prototype.collideBoundaries = function(width,height) {
 
-    if(this.width+this.x+paddleOffset > width+paddleOffset/2){
+    if (this.width+this.x+paddleOffset > width+paddleOffset/2) {
         this.x=width-this.width-paddleOffset;
         this.speedx=0;
     }
-    else if(this.x<paddleOffset/2){
+    else if (this.x<paddleOffset/2) {
         this.x=paddleOffset;
         this.speedx=0;
     }
 
-    if(this.height+this.y+paddleOffset > height+paddleOffset/2){
+    if (this.height+this.y+paddleOffset > height+paddleOffset/2) {
         this.y=height-this.height-paddleOffset;
         this.speedy=0;
     }
-    else if(this.y<paddleOffset/2){
+    else if (this.y<paddleOffset/2) {
         this.y=paddleOffset;
         this.speedy=0;
     }
@@ -238,7 +238,7 @@ BoxColliding.prototype.collideBoundaries = function(width,height){
  * @returns {BoxPaddle}
  *
  */
-function BoxPaddle(size,side,color){
+function BoxPaddle(size,side,color) {
 
     BoxColliding.call(this,0,0,size/4,size,0,((color)?color:"#fff"));
     this.side=side;
@@ -258,14 +258,14 @@ BoxPaddle.prototype.box = function() {
 /*
  * Move paddle Up
  */
-BoxPaddle.prototype.moveUp = function(){
+BoxPaddle.prototype.moveUp = function() {
     this.speed({"y":-paddleSpeed});
 };
 
 /*
  * Move paddle Down
  */
-BoxPaddle.prototype.moveDown = function(){
+BoxPaddle.prototype.moveDown = function() {
     this.speed({"y":paddleSpeed});
 };
 
@@ -276,13 +276,13 @@ BoxPaddle.prototype.moveDown = function(){
  * @param {type} height, height of scene
  * @returns {undefined}
  */
-BoxPaddle.prototype.reset =function(width,height){
+BoxPaddle.prototype.reset =function(width,height) {
 
-    if(this.side=="left"){
+    if (this.side=="left") {
         this.x=paddleOffset;
         this.y=(height-this.height)/2;
     }
-    else if(this.side=="right"){
+    else if (this.side=="right") {
         this.x=(width-this.width)-paddleOffset;
         this.y=(height-this.height)/2;
     }
@@ -299,7 +299,7 @@ BoxPaddle.prototype.reset =function(width,height){
  * @param {type} color
  * @returns {BoxBall}
  */
-function BoxBall(size,speed,color){
+function BoxBall(size,speed,color) {
     this.speed=speed;
     BoxColliding.call(this,0,0,size,size,1,((color)?color:"#fff"));
     this.stopped=true;
@@ -313,14 +313,14 @@ BoxBall.prototype= new BoxColliding();
  * Hold the ball into position. speed and direction information isn't lost
  *
  */
-BoxBall.prototype.stop = function(){
+BoxBall.prototype.stop = function() {
     this.stopped=true;
 };
 
 /*
  * Let the ball roll!
  */
-BoxBall.prototype.start= function(){
+BoxBall.prototype.start= function() {
     this.stopped=false;
 };
 
@@ -330,7 +330,7 @@ BoxBall.prototype.start= function(){
  * @param {type} width , width of the scene
  * @param {type} height, height of the scene
  */
-BoxBall.prototype.reset =function(width,height){
+BoxBall.prototype.reset =function(width,height) {
         this.x=(width-this.width)/2;
         this.y=(height-this.height)/2;
         this.speedx=(2*Math.round(Math.random())-1)*this.speed;
@@ -342,7 +342,7 @@ BoxBall.prototype.reset =function(width,height){
  *  Move ball to new position,based on speed, if it isn't stoppped
  */
 BoxBall.prototype.slide = function() {
-    if(!this.stopped)
+    if (!this.stopped)
         this.move(this.x+this.speedx,this.y+this.speedy);
 };
 
@@ -357,25 +357,25 @@ BoxBall.prototype.slide = function() {
  * @param {type} width
  * @param {type} height
  */
-BoxBall.prototype.collideBoundaries = function(width,height){
+BoxBall.prototype.collideBoundaries = function(width,height) {
 
-    if(this.width+this.x >= width){
-        if(this.goalCallback){
+    if (this.width+this.x >= width) {
+        if (this.goalCallback) {
             this.goalCallback.self[this.goalCallback.callback](0);
         }
 
         this.speedx=-Math.abs(this.speedx);
     }
-    else if(this.x<=0){
-        if(this.goalCallback)
+    else if (this.x<=0) {
+        if (this.goalCallback)
             this.goalCallback.self[this.goalCallback.callback](1);
         this.speedx=Math.abs(this.speedx);
     }
 
-    if(this.height+this.y>= height){
+    if (this.height+this.y>= height) {
         this.speedy=-Math.abs(this.speedy);
     }
-    else if(this.y<=0){
+    else if (this.y<=0) {
         this.speedy=Math.abs(this.speedy);
     }
 
@@ -387,65 +387,65 @@ BoxBall.prototype.collideBoundaries = function(width,height){
  *
  * @param {type} box, Box that is checked against the ball
  */
-BoxBall.prototype.collideBox = function (box){
-    var x1=this.x,y1=this.y,w1=this.width,h1=this.height,
+BoxBall.prototype.collideBox = function (box) {
+    let x1=this.x,y1=this.y,w1=this.width,h1=this.height,
         x2=box.x,y2=box.y,w2=box.width,h2=box.height;
-    var left=false,right=false,top=false,bottom=false, vert=false,horiz=false;  //left - right  , up - down
+    let left=false,right=false,top=false,bottom=false, vert=false,horiz=false;  //left - right  , up - down
 
-    if(x1>=x2 && x1<=x2+w2 && x1+w1> x2+w2 )
+    if (x1>=x2 && x1<=x2+w2 && x1+w1> x2+w2 )
         left=true; //left
-    else if(x1+w1>=x2 && x1+w1<=x2+w2 && x1 < x2)
+    else if (x1+w1>=x2 && x1+w1<=x2+w2 && x1 < x2)
         right=true; //right
-    else if(x1>=x2 && x1+w1<= x2+w2 ){
-        if((x1-x2)<(x2+w2-x1-w1))
+    else if (x1>=x2 && x1+w1<= x2+w2 ) {
+        if ((x1-x2)<(x2+w2-x1-w1))
             right=true;
-        else if((x1-x2)<(x2+w2-x1-w1))
+        else if ((x1-x2)<(x2+w2-x1-w1))
             left=true;
         else
             vert=true;
     }
-    else if(x1<=x2 && x1+w1>= x2+w2){
-        if((x2-x1)<(x1+w1-x2-w2))
+    else if (x1<=x2 && x1+w1>= x2+w2) {
+        if ((x2-x1)<(x1+w1-x2-w2))
             left=true;
-        else if((x2-x1)>(x1+w1-x2-w2))
+        else if ((x2-x1)>(x1+w1-x2-w2))
             right=true;
         else
             vert=true;
     }
 
-    if(y1>=y2 && y1<=y2+h2 && y1+h1> y2+h2 )
+    if (y1>=y2 && y1<=y2+h2 && y1+h1> y2+h2 )
         top=true; //top
-    else if(y1+h1>=y2 && y1+h1<=y2+h2 && y1 < y2)
+    else if (y1+h1>=y2 && y1+h1<=y2+h2 && y1 < y2)
         bottom=true; //bottom
-    else if(y1>=y2 && y1+h1<= y2+h2 ){
-        if((y1-y2)<(y2+h2-y1-h1))
+    else if (y1>=y2 && y1+h1<= y2+h2 ) {
+        if ((y1-y2)<(y2+h2-y1-h1))
             bottom=true;
-        else if((y1-y2)<(y2+h2-y1-h1))
+        else if ((y1-y2)<(y2+h2-y1-h1))
             top=true;
         else
             horiz=true;
     }
-    else if(y1<=y2 && y1+h1>= y2+h2){
-        if((y2-y1)<(y1+h1-y2-h2))
+    else if (y1<=y2 && y1+h1>= y2+h2) {
+        if ((y2-y1)<(y1+h1-y2-h2))
             top=true;
-        else if((y2-y1)>(y1+h1-y2-h2))
+        else if ((y2-y1)>(y1+h1-y2-h2))
             bottom=true;
         else
             horiz=true;
     }
 
 
-    if((top || bottom || horiz) && (left || right)){
+    if ((top || bottom || horiz) && (left || right)) {
 
-        if((this.lastHit == box.side) ){
+        if ((this.lastHit == box.side) ) {
             return;
         }
         else
             this.lastHit=((left)?"left":"right");
 
-        if(box.speedy * this.speedy < 0){
-            if(Math.abs(box.speedy)-Math.abs(this.speedy)<8*this.speed){
-                if(left)
+        if (box.speedy * this.speedy < 0) {
+            if (Math.abs(box.speedy)-Math.abs(this.speedy)<8*this.speed) {
+                if (left)
                     this.speedx=- this.speedx-((Math.abs(this.speedx)>this.speed)?this.speed:0);
                 else
                     this.speedx=-this.speedx+((Math.abs(this.speedx)>this.speed)?this.speed:0);
@@ -453,14 +453,14 @@ BoxBall.prototype.collideBox = function (box){
             else
                 this.speedx=-this.speedx;
 
-            if(this.speedy>0)
+            if (this.speedy>0)
                 this.speedy=this.speedy-(this.speed);
             else
                 this.speedy=this.speedy+(this.speed);
         }
-        else if((box.speedy * this.speedy >0) || (this.speedy==0 && box.speedy!=0)){
-            if(Math.abs(box.speedy)-Math.abs(this.speedy)<=2*this.speed){
-                if(left)
+        else if ((box.speedy * this.speedy >0) || (this.speedy==0 && box.speedy!=0)) {
+            if (Math.abs(box.speedy)-Math.abs(this.speedy)<=2*this.speed) {
+                if (left)
                     this.speedx=-this.speedx+((Math.abs(this.speedx)<4*this.speed)?this.speed:0);
                 else
                     this.speedx=-this.speedx-((Math.abs(this.speedx)>4*this.speed)?this.speed:0);
@@ -468,12 +468,12 @@ BoxBall.prototype.collideBox = function (box){
             else
                 this.speedx=-this.speedx;
 
-            if(this.speedy>0 || (this.speedy==0 && box.speedy>0) )
+            if (this.speedy>0 || (this.speedy==0 && box.speedy>0) )
                 this.speedy=this.speedy+((this.speedy<4*this.speed)?this.speed:0);
             else
                 this.speedy=this.speedy-((-this.speedy<4*this.speed)?this.speed:0);
         }
-        else{
+        else {
             this.speedx=-this.speedx;
         }
     }
@@ -486,8 +486,8 @@ BoxBall.prototype.collideBox = function (box){
  *
  * @param {Primitive} primitive
  */
-BoxBall.prototype.collidePrimitive = function (primitive){
-    if(primitive.shape === "box"){
+BoxBall.prototype.collidePrimitive = function (primitive) {
+    if (primitive.shape === "box") {
         this.collideBox(primitive);
     }
 
@@ -503,7 +503,7 @@ BoxBall.prototype.collidePrimitive = function (primitive){
  *                     self["callback"]
  * @param {String} callback, name of callback function
   */
-BoxBall.prototype.goalCallback = function (self,callback){
+BoxBall.prototype.goalCallback = function (self,callback) {
     this.goalCallback={"self":self,"callback":callback};
 };
 /*************************End BoxBall Class************************************/
@@ -519,7 +519,7 @@ BoxBall.prototype.goalCallback = function (self,callback){
  * @param {int} level, 0,1 or 2
  * @returns {AIPlayer}
  */
-function AIPlayer(scene,paddle,ball,level){
+function AIPlayer(scene,paddle,ball,level) {
     this.paddle=paddle;
     this.ball=ball;
     this.scene=scene;
@@ -542,29 +542,29 @@ function AIPlayer(scene,paddle,ball,level){
  *  consistently beats level2. against human opponents it isn't certain who is
  *  better.
  */
-AIPlayer.prototype.makeMove = function(){
-    var height=this.scene.height;
-    var paddleCenter=this.paddle.y+this.paddle.height/2;
-    var ballCenter=this.ball.y+this.ball.height/2;
-    var ballDistance= Math.abs(this.ball.x - this.paddle.x);
+AIPlayer.prototype.makeMove = function() {
+    let height=this.scene.height;
+    let paddleCenter=this.paddle.y+this.paddle.height/2;
+    let ballCenter=this.ball.y+this.ball.height/2;
+    let ballDistance= Math.abs(this.ball.x - this.paddle.x);
 
-    if((this.paddle.side=="left" && this.ball.speedx>0) ||
-       (this.paddle.side=="right" && this.ball.speedx<0) ){ //move to middle
-        if(Math.abs(paddleCenter - height/2) > paddleStep){ //prevent wiggling
-            if(this.level<=1)
+    if ((this.paddle.side=="left" && this.ball.speedx>0) ||
+       (this.paddle.side=="right" && this.ball.speedx<0) ) { //move to middle
+        if (Math.abs(paddleCenter - height/2) > paddleStep) { //prevent wiggling
+            if (this.level<=1)
                 return;
 
-            if(paddleCenter >height/2)
+            if (paddleCenter >height/2)
                 this.paddle.moveUp();
             else
                 this.paddle.moveDown();
         }
     }
-    else{
-        if((Math.abs(paddleCenter - ballCenter) > ballDistance  &&
+    else {
+        if ((Math.abs(paddleCenter - ballCenter) > ballDistance  &&
            ballDistance < 2 *Math.abs(paddleCenter -ballCenter)  ) ||
-           (this.level>=3 && Math.abs(paddleCenter - ballCenter)>Math.abs(this.ball.speedy) )){
-            if(paddleCenter >ballCenter)
+           (this.level>=3 && Math.abs(paddleCenter - ballCenter)>Math.abs(this.ball.speedy) )) {
+            if (paddleCenter >ballCenter)
                 this.paddle.moveUp();
             else
                 this.paddle.moveDown();
@@ -586,8 +586,8 @@ AIPlayer.prototype.makeMove = function(){
  *                  global method, so it is called directly.
  * @returns {Game}
  */
-export function Game(score,endGame){
-    this.scene=new PongNMScene("mainCanvas",30,"#000","#fff",paddleOffset);
+export function Game(score,endGame) {
+    this.scene=new PongNMScene("mainCanvas",30,paddleOffset);
     this.scene.init();
     this.scene.addCallback(this,"keysFix");
     this.maxScore=score;
@@ -613,7 +613,7 @@ export function Game(score,endGame){
  * @param {boolean} left, true if player is human, false if AI
  * @param {boolean} right, true if player is human, false if AI
  */
-Game.prototype.newGame = function(left,right){
+Game.prototype.newGame = function(left,right) {
 
     this.scene.clear();
     this.scene.addPrimitive(this.players[0]);
@@ -622,23 +622,23 @@ Game.prototype.newGame = function(left,right){
     this.scene.reset();
     this.human=new Array(left,right);
 
-    if(left && right){
+    if (left && right) {
         this.addPlayers(0,this.controls[1]);
         this.addPlayers(1,this.controls[0]);
     }
-    else if(left){
+    else if (left) {
         this.AI.push(new AIPlayer(this.scene,this.players[1],this.ball));
         this.addPlayers(0,this.controls[0]);
     }
-    else if(right){
+    else if (right) {
         this.AI.push(new AIPlayer(this.scene,this.players[0],this.ball));
         this.addPlayers(1,this.controls[0]);
     }
-    else{
+    else {
         this.AI.push(new AIPlayer(this.scene,this.players[0],this.ball),
                      new AIPlayer(this.scene,this.players[1],this.ball));
     }
-    for(var i=0;i<this.AI.length;i++){
+    for (let i=0;i<this.AI.length;i++) {
         this.scene.addCallback(this.AI[i],"makeMove");
     }
     this.scene.start();
@@ -656,16 +656,16 @@ Game.prototype.newGame = function(left,right){
  *  missed keyups that can make the paddle get stuck moving towards one side.
  *
  */
-Game.prototype.keysFix = function(){
+Game.prototype.keysFix = function() {
 
-    for(var i=0;i<this.players.length;i++){
+    for (let i=0;i<this.players.length;i++) {
 
-        if(this.human[i]){
-            if(this.keydownFix[i]>0){
+        if (this.human[i]) {
+            if (this.keydownFix[i]>0) {
                 this.players[i].moveUp();
                 this.keydownFix[i]--;
             }
-            else if(this.keydownFix[i]<0){
+            else if (this.keydownFix[i]<0) {
                 this.players[i].moveDown();
                 this.keydownFix[i]++;
             }
@@ -685,17 +685,17 @@ Game.prototype.keysFix = function(){
 Game.prototype.addPlayers = function(player,controls) {
 
     var that=this;
-    window.addEventListener("keydown", function(event){
+    window.addEventListener("keydown", function(event) {
 
-        var kcode=((event.charCode)?(event.charCode):(event.keyCode));
+        const kcode=((event.charCode)?(event.charCode):(event.keyCode));
 
-        if(kcode===controls.up){
+        if (kcode===controls.up) {
             that.players[player].moveUp();
             that.keydownFix[player]=50;
             event.preventDefault();
 
         }
-        else if(kcode===controls.down){
+        else if (kcode===controls.down) {
             that.players[player].moveDown() ;
             that.keydownFix[player]=-50;
             event.preventDefault();
@@ -704,11 +704,10 @@ Game.prototype.addPlayers = function(player,controls) {
         that.keycodeFix[player]=kcode;
     });
 
-    window.addEventListener("keyup", function(event){
+    window.addEventListener("keyup", function(event) {
+        const kcode=((event.charCode)?(event.charCode):(event.keyCode));
 
-        var kcode=((event.charCode)?(event.charCode):(event.keyCode));
-
-        if(kcode===that.keycodeFix[player]){
+        if (kcode===that.keycodeFix[player]) {
             that.keycodeFix[player]=0;
             that.keydownFix[player]=0;
             event.preventDefault();
@@ -727,18 +726,18 @@ Game.prototype.addPlayers = function(player,controls) {
  *
  * @param {int} who, [0,1] array index of player that scored.
  */
-Game.prototype.goal = function(who){
+Game.prototype.goal = function(who) {
 
     this.scene.score[who]++;
     var self=this;
 
-    if(this.scene.score[who]>=this.maxScore){
+    if (this.scene.score[who]>=this.maxScore) {
         this.scene.stop();
         this.scene.clear();
 //        console.log("final score : Level ",this.AI[0].level,": ", this.scene.score[0],". Level ",this.AI[1].level,": ", this.scene.score[1]);
         this.scene.score[0]="Player "+(who+1);
         while(this.scene.context.measureText(this.scene.score[0]).width > (this.scene.width/2 - 2*paddleOffset)
-              && (this.scene.fontSize>0)){
+              && (this.scene.fontSize>0)) {
             this.scene.fontSize--;
             this.scene.context.font = "bold "+this.scene.fontSize+
             "px 'Share Tech Mono','monospace'";
@@ -746,19 +745,19 @@ Game.prototype.goal = function(who){
         this.scene.score[1]="wins!!! ";
         this.end=true;
         this.scene.redraw();
-        if(this.endGame){
-            if(this.endGame.self)
+        if (this.endGame) {
+            if (this.endGame.self)
                 this.endGame.self[this.endGame.callback]();
             else
                 this.endGame();
         }
 
     }
-    else{
+    else {
         this.scene.reset();
         this.ball.stop();
-        setTimeout(function(){
-            if(!self["end"])
+        setTimeout(function() {
+            if (!self["end"])
                 self["ball"].start();
         },1000);
     }

@@ -15,35 +15,39 @@
     <div class="root">
         <canvas id="mainCanvas" width="400" height="300"></canvas>
         <div class="controls">
-            <button type="button" id="start_game_button">Start game</button>
+            <h2>PongNM</h2>
+            <div class="controls-group">
+                <button type="button" id="start_game_button">Start game</button>
 
-            <label for="player1">
-                Player 1
-                <input type="checkbox" id="player1" checked>
-            </label>
-            <label for="player2">
-                Player 2
-                <input type="checkbox" id="player2" >
-            </label>
-            <label for="max_score">Max Score:</label>
-            <select id="max_score">
-                <option>3</option>
-                <option>7</option>
-                <option>11</option>
-                <option>21</option>
-            </select>
-            <label for="pc_level1">First AI Level:</label>
-            <select id="pc_level1">
-                <option>1</option>
-                <option>2</option>
-                <option>3</option>
-            </select>
-            <label for="pc_level2">Second AI Level:</label>
-            <select id="pc_level2">
-                <option>1</option>
-                <option>2</option>
-                <option>3</option>
-            </select>
+                <label for="player1">
+                    Player 1: Human
+                    <input type="checkbox" id="player1" checked>
+                </label>
+                <label for="player2">
+                    Player 2: Human
+                    <input type="checkbox" id="player2" >
+                </label>
+                <label for="max_score">Max Score:</label>
+                <select id="max_score">
+                    <option>1</option>
+                    <option>3</option>
+                    <option>7</option>
+                    <option>11</option>
+                    <option>21</option>
+                </select>
+                <label for="pc_level1">First AI Level:</label>
+                <select id="pc_level1">
+                    <option>1</option>
+                    <option>2</option>
+                    <option>3</option>
+                </select>
+                <label for="pc_level2">Second AI Level:</label>
+                <select id="pc_level2">
+                    <option>1</option>
+                    <option>2</option>
+                    <option>3</option>
+                </select>
+            </div>
         </div>
     </div>
     <script type="module" src="js/main.js"></script>
