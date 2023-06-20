@@ -12,11 +12,10 @@ class Scene {
     start() {
         if (this.refresh > 0) {
             this.stop();
-            var self = this;
             this.timerid = window.setInterval(
-                function () {
-                    self["redraw"]();
-                }, this.refresh);
+                () => this.redraw(),
+                this.refresh
+            );
         }
     }
 
@@ -124,7 +123,8 @@ export class PongNMScene extends Scene {
     }
 
     init() {
-        Scene.prototype.init.call(this,"init");
+        super.init();
+
         this.context.font = "bold "+this.fontSize+
                 "px 'Share Tech Mono','monospace'";
 
@@ -171,6 +171,7 @@ export class PongNMScene extends Scene {
             this.callbacks[i].self[this.callbacks[i].callback]();
         }
 
+        console.log(this.queue);
         for (let i=0;i<this.queue.length;i++) {
 
             this.queue[i]["slide"]();
