@@ -3,12 +3,9 @@ import { Game } from './game.js';
 
 /*
  * TODO
- * move parts to separate files
- * change to es6 code (that/this, var, classes, etc)
- * try to fix styling with es6
- * fix mesh with callbacks
- * fix mesh with inheritance
+ * try to fix styling with eslint
  * add touch functionality
+ * fix PWA
  */
 
 function* settingsValues() {

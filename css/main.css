@@ -41,6 +41,10 @@ canvas {
     justify-content: center;
 }
 
+.controls h2 {
+    background: rgba(0, 0, 0, 0.8);
+}
+
 .controls-group {
     font-size: x-large;
     display: flex;

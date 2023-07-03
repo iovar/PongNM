@@ -3,47 +3,21 @@ import { config, getDynamicConfig } from './config.js';
 const { paddleStep, paddleOffset, paddleSpeed } = getDynamicConfig();
 
 class Scene {
-    constructor(elemid, refresh) {
-        this.elemid = elemid;
-        this.valid = true;
-        this.refresh = refresh ? refresh : 0;
-    }
+    constructor() {}
 
     start() {
-        if (this.refresh > 0) {
             this.stop();
             this.timerid = window.setInterval(
                 () => this.redraw(),
-                this.refresh
+                config.refreshInterval
             );
-        }
     }
 
     stop() {
-        if (this.timerid)
+        if (this.timerid) {
             window.clearInterval(this.timerid);
-    }
-
-    redraw() {
-        const context = this.context;
-
-        context.fillStyle = config.background;
-        context.strokeStyle = config.foreground;
-
-        context.fillRect(0, 0, this.width, this.height);
-
-
-        for (let i = 0; i < this.callbacks.length; i++) {
-            this.callbacks[i].self[this.callbacks[i].callback]();
+            this.timerid = null;
         }
-
-        for (let i = 0; i < this.queue.length; i++) {
-            this.queue[i].draw(context);
-        }
-    }
-
-    add(callback) {
-        this.queue.push(callback);
     }
 
     remove(callback) {
@@ -53,34 +27,13 @@ class Scene {
         }
     }
 
-    addCallback(self, callback) {
-        this.callbacks.push({ "self": self, "callback": callback });
+    addCallback(callback) {
+        this.callbacks.push(callback);
     }
 
     reset() {
         for (let i = 0; i < this.queue.length; i++) {
             this.queue[i]["reset"](this.width, this.height);
-        }
-    }
-
-    videoInit() {
-        this.drawing = document.getElementById(this.elemid);
-        if (!this.drawing.getContext)
-            this.valid = false;
-        else
-            this.context = this.drawing.getContext("2d");
-    }
-
-    init() {
-        this.videoInit();
-        if (this.valid) {
-            this.width = this.drawing.width;
-            this.height = this.drawing.height;
-
-            this.queue = new Array();
-            this.callbacks = new Array();
-            this.redraw();
-
         }
     }
 
@@ -91,10 +44,6 @@ class Scene {
             return ((a.z <= b.z) ? -1 : 1);
         });
     }
-
-    clear() {
-        this.queue.length = 0;
-    }
 }
 
 
@@ -102,29 +51,27 @@ class Scene {
 /*
  * Scene that is adjusted to this particular game. It paints scores and a line
  * in the middle. Also it calls the correct collision functions.
- *
- * See Scene documentation for more
- *
- *
- * @param {string} elemid
- * @param {inbt} refresh
- * @param {string} backgroundColor
- * @param {string} foregroundColor
- * @param {int} lineWidth
- * @returns {PongNMScene}
  */
 export class PongNMScene extends Scene {
-    constructor(elemid,refresh,lineWidth) {
-        super(elemid,refresh);
+    constructor() {
+        super();
 
-        this.lineWidth=lineWidth;
         this.score= new Array(0,0);
         this.fontSize=5*paddleOffset;
     }
 
-    init() {
-        super.init();
+    videoInit() {
+        this.drawing = document.getElementById(config.canvasId);
+        this.context = this.drawing.getContext("2d");
+        this.width = this.drawing.width;
+        this.height = this.drawing.height;
+    }
 
+    init() {
+        this.videoInit();
+
+        this.queue = [];
+        this.callbacks = [];
         this.context.font = "bold "+this.fontSize+
                 "px 'Share Tech Mono','monospace'";
 
@@ -136,7 +83,7 @@ export class PongNMScene extends Scene {
 
         context.fillStyle = config.background;
         context.strokeStyle = config.foreground;
-        context.lineWidth=this.lineWidth;
+        context.lineWidth= paddleOffset;
 
         context.fillRect(0,0,this.width,this.height);
 
@@ -168,16 +115,18 @@ export class PongNMScene extends Scene {
         context.stroke();
 
         for (let i=0;i<this.callbacks.length;i++) {
-            this.callbacks[i].self[this.callbacks[i].callback]();
+            this.callbacks[i]();
         }
 
-        console.log(this.queue);
         for (let i=0;i<this.queue.length;i++) {
-
+            const l = this.queue.length;
             this.queue[i]["slide"]();
             if (this.queue[i]["collideBoundaries"])
                 this.queue[i]["collideBoundaries"](this.width,this.height);
 
+            if (this.queue.length!=l) {
+                console.trace("Scene.queue changed during iteration");
+            }
             this.queue[i]["draw"](context);
             if (this.queue[i]["collidePrimitive"]) {
                 for (let k=0;k<this.queue.length;k++) {

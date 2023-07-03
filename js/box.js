@@ -131,6 +131,13 @@ export class BoxPaddle extends BoxColliding {
         };
     }
 
+    center() {
+        return {
+            x: this.x+this.width/2,
+            y: this.y+this.height/2,
+        };
+    }
+
     moveUp() {
         this.speed({"y":-paddleSpeed});
     }
@@ -184,13 +191,13 @@ export class BoxBall extends BoxColliding {
     collideBoundaries(width, height) {
         if (this.width+this.x >= width) {
             if (this.goalCallback) {
-                this.goalCallback.self[this.goalCallback.callback](0);
+                this.goalCallback(0);
             }
 
             this.speedx=-Math.abs(this.speedx);
         } else if (this.x<=0) {
             if (this.goalCallback)
-                this.goalCallback.self[this.goalCallback.callback](1);
+                this.goalCallback(1);
             this.speedx=Math.abs(this.speedx);
         }
 
@@ -293,13 +300,13 @@ export class BoxBall extends BoxColliding {
         }
     }
 
-    collidePrimitive = function (primitive) {
+    collidePrimitive(primitive) {
         if (primitive.shape === "box") {
             this.collideBox(primitive);
         }
     }
 
-    setGoalCallback(self, callback) {
-        this.goalCallback={"self":self,"callback":callback};
+    setGoalCallback(callback) {
+        this.goalCallback= callback;
     }
 }

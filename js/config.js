@@ -22,4 +22,6 @@ export const config = {
     pcLevel2Id: "pc_level2",
     maxScoreId: "max_score",
     controlsId: "controls",
+    canvasId: "mainCanvas",
+    refreshInterval: 30,
 };
