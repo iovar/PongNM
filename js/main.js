@@ -4,7 +4,6 @@ import { Game } from './game.js';
 /*
  * TODO
  * try to fix styling with eslint
- * add touch functionality
  * fix PWA
  */
 

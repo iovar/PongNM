@@ -105,34 +105,48 @@ export class Game {
         }
     }
 
-    getPos(player, canvas) {
-        const factor = canvas.clientWidth / this.scene.width;
+    getPos(player, canvas, touch) {
+        const isPortrait = window.screen.orientation.type.startsWith('portrait');
+
+        const { x, y, width, height } = canvas.getBoundingClientRect();
+        const factor = (isPortrait ? height : width) / this.scene.width;
+        const { clientX, clientY } = touch;
 
         const pos = this.players[player].center();
-        const { clientTop, clientLeft, clientWidth } = canvas;
-        return {
-            centerX: ((this.scene.width * factor) / 2) + clientLeft,
-            x: (pos.x * factor) + clientLeft,
-            y: (pos.y * factor) + clientTop,
+
+        const centerX = ((this.scene.width * factor) / 2) + x;
+        const playerIsLeft = x < centerX;
+
+        const posData = isPortrait ? {
+            x: (pos.x * factor) + y,
+            y: (pos.y * factor) + x,
+            eventX: clientY,
+            eventY: clientX,
+        } : {
+            x: (pos.x * factor) + x,
+            y: (pos.y * factor) + y,
+            eventX: clientX,
+            eventY: clientY,
         };
+        const touchIsLeft = posData.eventX < centerX;
+        const playerAct = (!isPortrait && (playerIsLeft !== touchIsLeft))
+            || (isPortrait && (playerIsLeft === touchIsLeft)) ? 1 : 0;
+
+        return { ...posData, playerAct };
     }
 
     touchstart(event, player, canvas) {
-        const { x, y, centerX } = this.getPos(player, canvas);
-        const { clientX, clientY } = event.touches[0];
+        const { x, y, eventX, eventY, playerAct } = this.getPos(player, canvas, event.touches[0]);
 
-        const playerIsLeft = x < centerX;
-        const touchIsLeft = clientX < centerX;
-
-        if (playerIsLeft !== touchIsLeft) {
+        if (playerAct !== player) {
             return;
         }
 
-        if (clientY < y) {
+        if (eventY < y) {
             this.players[player].moveUp();
             this.keydownFix[player]=50;
             event.preventDefault();
-        } else if (clientY > y) {
+        } else if (eventY > y) {
             this.players[player].moveDown() ;
             this.keydownFix[player]=-50;
             event.preventDefault();
@@ -140,14 +154,9 @@ export class Game {
     }
 
     touchend(event, player, canvas) {
-        const { x, y, centerX } = this.getPos(player, canvas);
-        const { clientX, clientY } = event.changedTouches[0];
+        const { x, y, eventX, eventY, playerAct } = this.getPos(player, canvas, event.changedTouches[0]);
 
-        const playerIsLeft = x < centerX;
-        const touchIsLeft = clientX < centerX;
-
-        console.log(playerIsLeft, touchIsLeft);
-        if (playerIsLeft !== touchIsLeft) {
+        if (playerAct !== player) {
             return;
         }
 
