@@ -5,6 +5,7 @@ import { Game } from './game.js';
  * TODO
  * try to fix styling with eslint
  * fix PWA
+ *
  */
 
 function* settingsValues() {
@@ -27,14 +28,14 @@ function* settingsValues() {
 }
 
 function* settingsVisibility(show) {
-    const controls = document.querySelector(".controls");
+    const settingsContainer = document.getElementById(config.settingsContainerId);
     let visible = show;
 
     while(true) {
         if (visible) {
-            controls.classList.remove('hidden');
+            settingsContainer.classList.remove('hidden');
         } else {
-            controls.classList.add('hidden');
+            settingsContainer.classList.add('hidden');
         }
 
         visible = yield;

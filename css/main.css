@@ -29,7 +29,7 @@ canvas {
     height: auto;
 }
 
-.controls {
+#settings-container {
     position: absolute;
     top: 0;
     left: 0;
@@ -41,18 +41,18 @@ canvas {
     justify-content: center;
 }
 
-.controls h2 {
-    background: rgba(0, 0, 0, 0.8);
+#settings-container h2 {
+    background: rgba(0, 0, 0, 1);
 }
 
-.controls-group {
+.settings-controls {
     font-size: x-large;
     display: flex;
     flex-direction: column;
     width: 250px;
     min-height: 320px;
     justify-content: space-between;
-    background: rgba(0, 0, 0, 0.8);
+    background: rgba(0, 0, 0, 1);
 }
 
 button, select {
@@ -77,6 +77,8 @@ h2 {
 
 @media (orientation: portrait) {
     canvas {
+        height: 100vw;
+        width: auto;
         transform: rotate3d(0, 0, 1, -90deg);
     }
 }

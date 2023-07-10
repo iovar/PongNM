@@ -17,6 +17,7 @@ export class Game {
         this.scene=new PongNMScene();
         this.scene.init();
         this.scene.addCallback(() => this.keysFix());
+        this.scene.addCallback(() => this.touchFix());
         this.maxScore=score;
 
         this.players= [
@@ -30,11 +31,12 @@ export class Game {
 
         this.keycodeFix= [0,0];
         this.keydownFix= [0,0];
+        this.touchEventFix= [false,false];
         this.human= [false,false];
         this.AI = [];
         this.controls = [
-            {"up":38,"down":40},
-            {"up":87,"down":83},
+            { left:37, up:38, right: 39, down:40 },
+            { left:65, up:87, right: 68, down:83},
         ];
     }
 
@@ -46,7 +48,6 @@ export class Game {
      * @param {boolean} right, true if player is human, false if AI
      */
     newGame(left,right) {
-
         this.scene.clear();
         this.scene.addPrimitive(this.players[0]);
         this.scene.addPrimitive(this.players[1]);
@@ -91,7 +92,6 @@ export class Game {
      */
     keysFix() {
         for (let i=0;i<this.players.length;i++) {
-
             if (this.human[i]) {
                 if (this.keydownFix[i]>0) {
                     this.players[i].moveUp();
@@ -101,6 +101,16 @@ export class Game {
                     this.players[i].moveDown();
                     this.keydownFix[i]++;
                 }
+            }
+        }
+    }
+
+    touchFix() {
+        for (let i=0;i<this.players.length;i++) {
+            if (this.human[i] && this.touchEventFix[i]) {
+                this.touchEventFix[i] = false;
+            } else if (this.human[i]) {
+                this.players[i].speed({ y: 0 });
             }
         }
     }
@@ -138,19 +148,35 @@ export class Game {
     touchstart(event, player, canvas) {
         const { x, y, eventX, eventY, playerAct } = this.getPos(player, canvas, event.touches[0]);
 
+        if ((playerAct !== player)
+            || (eventY > y + paddleStep * 4)
+            || (eventY < y - paddleStep * 4)
+        ) {
+            return;
+        }
+
+        this.doTouchMove(eventY, y, player);
+    }
+
+    doTouchMove(eventY, y, player) {
+        if (eventY < y) {
+            this.players[player].moveUp();
+            event.preventDefault();
+        } else if (eventY > y) {
+            this.players[player].moveDown() ;
+            event.preventDefault();
+        }
+        this.touchEventFix[player] = true;
+    }
+
+    touchmove(event, player, canvas) {
+        const { x, y, eventX, eventY, playerAct } = this.getPos(player, canvas, event.changedTouches[0]);
+
         if (playerAct !== player) {
             return;
         }
 
-        if (eventY < y) {
-            this.players[player].moveUp();
-            this.keydownFix[player]=50;
-            event.preventDefault();
-        } else if (eventY > y) {
-            this.players[player].moveDown() ;
-            this.keydownFix[player]=-50;
-            event.preventDefault();
-        }
+        this.doTouchMove(eventY, y, player);
     }
 
     touchend(event, player, canvas) {
@@ -160,20 +186,19 @@ export class Game {
             return;
         }
 
-        this.keydownFix[player]=0;
+        this.touchEventFix[player]=0;
         event.preventDefault();
     }
 
     keydown(event, player, controls) {
         const kcode=((event.charCode)?(event.charCode):(event.keyCode));
 
-        if (kcode===controls.up) {
+        if (kcode===controls.up || kcode === controls.left) {
             this.players[player].moveUp();
             this.keydownFix[player]=50;
             event.preventDefault();
-
         }
-        else if (kcode===controls.down) {
+        else if (kcode===controls.down || kcode === controls.right) {
             this.players[player].moveDown() ;
             this.keydownFix[player]=-50;
             event.preventDefault();
@@ -206,6 +231,7 @@ export class Game {
         const canvas = document.getElementById(config.canvasId);
 
         canvas.addEventListener("touchstart", (e) => this.touchstart(e, player, canvas));
+        canvas.addEventListener("touchmove", (e) => this.touchmove(e, player, canvas));
         canvas.addEventListener("touchend", (e) => this.touchend(e, player, canvas));
         window.addEventListener("keydown", (e) => this.keydown(e, player, controls));
         window.addEventListener("keyup", (e) => this.keyup(e, player));

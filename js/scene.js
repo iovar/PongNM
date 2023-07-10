@@ -47,7 +47,6 @@ class Scene {
 }
 
 
-/****************************Start PongNMScene Class***************************/
 /*
  * Scene that is adjusted to this particular game. It paints scores and a line
  * in the middle. Also it calls the correct collision functions.
