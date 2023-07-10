@@ -1,8 +1,9 @@
 PongNM
 ======
 
-PongNM stands for Pong Not iMproved
+Play [here](https://iovar.github.io/PongNM/)
 
+PongNM stands for Pong Not iMproved
 
 Open index.html to any modern browser, set your preferences and just play.
 You can play human-vs-human, human-vs-pc and pc-vs-pc. On human-vs-pc, 
@@ -14,8 +15,3 @@ player 1 gets the key 'w' for up and the key 's' for down, while player 2
 gets the arrows.
 
 PongNM is released under the MIT license. See LICENSE.txt for more.
-
-
-You can send questions, improvements, comments, etc at johnvarouhakis@gmail.com.
-
-
