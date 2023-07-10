@@ -5,6 +5,9 @@ html, body {
     padding: 0;
     font-family: monospace;
     font-size: 16px;
+    touch-action: none;
+    -webkit-user-select: none;
+    user-select: none;
 }
 
 .root {
@@ -75,7 +78,7 @@ h2 {
     }
 }
 
-@media (orientation: portrait) {
+@media (max-aspect-ratio: 3/4) {
     canvas {
         height: 100vw;
         width: auto;

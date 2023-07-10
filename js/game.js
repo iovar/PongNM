@@ -142,16 +142,14 @@ export class Game {
         const playerAct = (!isPortrait && (playerIsLeft !== touchIsLeft))
             || (isPortrait && (playerIsLeft === touchIsLeft)) ? 1 : 0;
 
+        const inBox =  (clientY > y + paddleStep * 4) || (clientY < y - paddleStep * 4);
         return { ...posData, playerAct };
     }
 
     touchstart(event, player, canvas) {
-        const { x, y, eventX, eventY, playerAct } = this.getPos(player, canvas, event.touches[0]);
+        const { x, y, eventX, eventY, playerAct, inBox } = this.getPos(player, canvas, event.touches[0]);
 
-        if ((playerAct !== player)
-            || (eventY > y + paddleStep * 4)
-            || (eventY < y - paddleStep * 4)
-        ) {
+        if ((playerAct !== player) || !inBox) {
             return;
         }
 
