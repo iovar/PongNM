@@ -13,5 +13,3 @@ to use the AI level indicated by the "First AI Level" selection.
 Controls are up-down arrows, in single player mode, while in human-vs-human
 player 1 gets the key 'w' for up and the key 's' for down, while player 2
 gets the arrows.
-
-PongNM is released under the MIT license. See LICENSE.txt for more.
